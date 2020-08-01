@@ -1,14 +1,14 @@
 # I²C Bus (`i2c-bus`-like) interface for the Tca9548a bus switch.
 Provides a `I2CBus` that can be use for abstracting bus managment from device setup and configurations.
 
-[![npm Version](http://img.shields.io/npm/v/@johntalton/i2c-bus-tca9548.svg)](https://www.npmjs.com/package/@johntalton/i2c-bus-tca9548)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/johntalton/i2c-bus-tca9548)
-![CI](https://github.com/johntalton/i2c-bus-tca9548/workflows/CI/badge.svg)
-![CodeQL](https://github.com/johntalton/i2c-bus-tca9548A/workflows/CodeQL/badge.svg)
-![GitHub](https://img.shields.io/github/license/johntalton/i2c-bus-tca9548)
-[![Downloads Per Month](http://img.shields.io/npm/dm/@johntalton/i2c-bus-tca9548.svg)](https://www.npmjs.com/package/@johntalton/i2c-bus-tca9548)
-![GitHub last commit](https://img.shields.io/github/last-commit/johntalton/i2c-bus-tca9548)
-[![Package Quality](https://npm.packagequality.com/shield/%40johntalton%2Fi2c-bus-tca9548.svg)](https://packagequality.com/#?package=@johntalton/i2c-bus-tca9548)
+[![npm Version](http://img.shields.io/npm/v/@johntalton/i2c-bus-tca9548a.svg)](https://www.npmjs.com/package/@johntalton/i2c-bus-tca9548a)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/johntalton/i2c-bus-tca9548a)
+![CI](https://github.com/johntalton/i2c-bus-tca9548a/workflows/CI/badge.svg)
+![CodeQL](https://github.com/johntalton/i2c-bus-tca9548a/workflows/CodeQL/badge.svg)
+![GitHub](https://img.shields.io/github/license/johntalton/i2c-bus-tca9548a)
+[![Downloads Per Month](http://img.shields.io/npm/dm/@johntalton/i2c-bus-tca9548a.svg)](https://www.npmjs.com/package/@johntalton/i2c-bus-tca9548a)
+![GitHub last commit](https://img.shields.io/github/last-commit/johntalton/i2c-bus-tca9548a)
+[![Package Quality](https://npm.packagequality.com/shield/%40johntalton%2Fi2c-bus-tca9548a.svg)](https://packagequality.com/#?package=@johntalton/i2c-bus-tca9548a)
 
 ## Usage
 (see [this example]() to see the non-bus style functional interaction for manual bus managment)
