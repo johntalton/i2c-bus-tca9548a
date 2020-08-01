@@ -1,0 +1,8 @@
+name: Security-and-Quality
+
+queries:
+  - uses: security-and-quality
+
+paths-ignore: 
+  - node_modules
+

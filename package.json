@@ -1,0 +1,19 @@
+{
+  "name": "@johntalton/i2c-bus-tca9548a",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/johntalton/i2c-bus-tca9548a"
+  },
+  "author": "johntalton@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.6.0",
+    "mocha": "^8.1.0"
+  }
+}
