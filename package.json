@@ -60,6 +60,6 @@
     "eslint-plugin-security": "^1.4.0",
     "eslint-plugin-spellcheck": "0.0.17",
     "@johntalton/tca9548a": "^4.0.0",
-    "throat": "^5.0.0"
+    "throat": "^6.0.1"
   }
 }
