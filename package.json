@@ -40,7 +40,7 @@
   "author": "johntalton@gmail.com",
   "license": "MIT",
   "devDependencies": {
-    "@johntalton/and-other-delights": "^3.0.2",
+    "@johntalton/and-other-delights": "^5.0.0",
     "chai": "^4.2.0",
     "eslint": "^7.6.0",
     "i2c-bus": "^5.2.0",
