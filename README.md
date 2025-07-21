@@ -101,7 +101,7 @@ Enable, exclusively, a channel (or channels) during bus calls.
 
 This example will set the channels explicitly to `3` (and only `3`) prior to any further bus calls. And it will restore the existing set channels after bus operations.
 
-```json
+```js
 {
   exclusive: [ 3 ],
   restore: true
