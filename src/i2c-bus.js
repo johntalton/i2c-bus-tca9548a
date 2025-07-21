@@ -1,61 +1,68 @@
-/* eslint-disable promise/no-nesting */
-/* eslint-disable no-useless-return */
-/* eslint-disable init-declarations */
-/* eslint-disable fp/no-let */
+import { Tca9548a } from '@johntalton/tca9548a'
 
-/**
- *
- **/
-class I2CTca9548aBus /* extends I2CBus */ {
-  static wrap(provider, channel, fn) {
-    let error = false;
-    let result;
+import { isChannelManager, DefaultChannelManager } from './channel-manager.js'
 
-    // console.log('wrap provider', provider);
+export class I2CBusTCA9548A {
+	#bus
+	#device
+	#channelManager
 
-    return provider.lock(() => {
-      return provider.manager.before(channel)
-        .then(() => fn())
-        .then(r => { result = r; return; })
-        .catch(e => { error = e; })
-        .then(() => provider.manager.after().catch(e => console.log('deep after fail', e)))
-        .then(() => {
-          if(error) { throw error; }
-          // console.log('returning result', result);
-          return result;
-        });
-    });
-  }
+	static async wrap(provider, fn) {
+		return provider.#channelManager.before(provider.#device)
+			.then(() => {
+				const future = fn(provider.#bus)
+				future.finally(() => provider.#channelManager.after(provider.#device))
+				return future
+			})
+	}
 
-  constructor(busNumberChannel, provider) {
-    // super();
-    this.channel = busNumberChannel;
-    this.provider = provider;
-  }
+	static async XXXwrap(provider, fn) {
+		return provider.#bus.transaction(bus => {
+			console.log('transaction 1', bus.name)
+			return provider.#channelManager.before(provider.#device)
+				.then(() => {
+					console.log('transaction 2', bus.name)
+					const future = fn(bus)
+					future.finally(() => provider.#channelManager.after(provider.#device))
+					return future
+				})
+		})
+	}
 
-  close() {
-    this.manager.close();
-  }
+	static from(bus, device, channelManagerOrStrategy) { return new I2CBusTCA9548A(bus, device, channelManagerOrStrategy) }
 
-  sendByte(address, byte) {
-    this.manager.sendByte();
-  }
+	constructor(bus, device, channelManagerOrStrategy) {
+		this.#bus = bus
+		this.#device = device
+		this.#channelManager = isChannelManager(channelManagerOrStrategy) ?
+			channelManagerOrStrategy :
+			new DefaultChannelManager(channelManagerOrStrategy)
+	}
 
-  readI2cBlock(address, cmd, length, buffer) {
-    return I2CTca9548aBus.wrap(this.provider, this.channel, () => this.provider.sourceBus.readI2cBlock(address, cmd, length, buffer));
-  }
+	get name() {
+		return `ManagedChannelBus(${this.#bus.name})`
+	}
 
-  writeI2cBlock(address, cmd, length, buffer) {
-    return I2CTca9548aBus.wrap(this.provider, this.channel, () => this.provider.sourceBus.writeI2cBlock(address, cmd, length, buffer));
-  }
+	close() {
+	}
 
-  i2cRead(address, length, buffer) {
-    return I2CTca9548aBus.wrap(this.provider, this.channel, () => this.provider.sourceBus.i2cRead(address, length, buffer));
-  }
+	sendByte(address, byte) {
+		throw new Error('no implementation')
+	}
 
-  i2cWrite(address, length, buffer) {
-    return I2CTca9548aBus.wrap(this.provider, this.channel, () => this.provider.sourceBus.i2cWrite(address, length, buffer));
-  }
+	readI2cBlock(address, cmd, length, buffer) {
+		return I2CBusTCA9548A.wrap(this, async bus => bus.readI2cBlock(address, cmd, length, buffer))
+	}
+
+	writeI2cBlock(address, cmd, length, buffer) {
+		return I2CBusTCA9548A.wrap(this, async bus => bus.writeI2cBlock(address, cmd, length, buffer))
+	}
+
+	i2cRead(address, length, buffer) {
+		return I2CBusTCA9548A.wrap(this, async bus => bus.i2cRead(address, length, buffer))
+	}
+
+	i2cWrite(address, length, buffer) {
+		return I2CBusTCA9548A.wrap(this, async bus => bus.i2cWrite(address, length, buffer))
+	}
 }
-
-module.exports = { I2CTca9548aBus };
