@@ -1,6 +1,6 @@
 {
   "name": "@johntalton/i2c-bus-tca9548a",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "johntalton@gmail.com",
   "license": "MIT",
   "main": "src/index.js",
@@ -19,5 +19,8 @@
   },
   "peerDependencies": {
     "@johntalton/tca9548a": "^5.1.1"
+  },
+  "devDependencies": {
+    "@johntalton/and-other-delights": "^8.6.0"
   }
 }

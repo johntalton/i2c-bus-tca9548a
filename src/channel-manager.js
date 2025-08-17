@@ -1,7 +1,29 @@
+/**
+ * @import { Tca9548a } from '@johntalton/tca9548a'
+ */
+
+/**
+ * @typedef {Object} ChannelManager
+ * @property {function(Tca9548a): Promise<void>} before
+ * @property {function(Tca9548a): Promise<void>} after
+ */
+
+/**
+ * @typedef {Object} Strategy
+ */
+
+
+/**
+ * @param {any} object
+ * @returns {object is ChannelManager}
+ */
 export function isChannelManager(object) {
 	return (('before' in object) && ('after' in object))
 }
 
+/**
+ * @implements {ChannelManager}
+ */
 export class DefaultChannelManager {
 	#exclusive
 	#pedantic
@@ -9,6 +31,9 @@ export class DefaultChannelManager {
 	#restore
 	#previous
 
+	/**
+	 * @param {Strategy} strategy
+	 */
 	constructor(strategy) {
 		const exclusive = strategy?.exclusive ?? []
 		const allow = strategy?.allow ?? []
@@ -45,6 +70,8 @@ export class DefaultChannelManager {
 				.intersection(this.#allow)
 				.union(this.#exclusive) ])
   }
+
+	/** @param {Tca9548a} device  */
 	async after(device) {
 		if(this.#restore && (this.#previous.size !== 0) && !this.#pedantic) {
 			return device.setChannels([ ...this.#previous ])
