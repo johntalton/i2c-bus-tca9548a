@@ -2,12 +2,12 @@
 
 Provides a `I2CBus` interface for managing the channels for the TCA9548
 
+This makes channel management transparent to most device implementation and simplifies program logic.
+
 [![npm Version](http://img.shields.io/npm/v/@johntalton/i2c-bus-tca9548a.svg)](https://www.npmjs.com/package/@johntalton/i2c-bus-tca9548a)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/johntalton/i2c-bus-tca9548a)
-![CI](https://github.com/johntalton/i2c-bus-tca9548a/workflows/CI/badge.svg)
-![GitHub](https://img.shields.io/github/license/johntalton/i2c-bus-tca9548a)
-[![Downloads Per Month](http://img.shields.io/npm/dm/@johntalton/i2c-bus-tca9548a.svg)](https://www.npmjs.com/package/@johntalton/i2c-bus-tca9548a)
-![GitHub last commit](https://img.shields.io/github/last-commit/johntalton/i2c-bus-tca9548a)
+[![CI](https://github.com/johntalton/i2c-bus-tca9548a/actions/workflows/CI.yml/badge.svg)](https://github.com/johntalton/i2c-bus-tca9548a/actions/workflows/CI.yml)
+
 
 
 - [Usage Example](#usage)
@@ -17,12 +17,11 @@ Provides a `I2CBus` interface for managing the channels for the TCA9548
 
 # Description
 
-While the TCA9548 can be use "along size" other existing chips, the orchestration code needed can be burdensome 😢.
+While the TCA9548 can be managed explicitly, the orchestration code needed can be burdensome 😢.
 
 This library provides an abstraction of the [`I2CBus`](https://github.com/johntalton/and-other-delights) while exposing the `ChannelManager` interface 👍.
 
 This allows device code to be abstractly written against the `I2CBus` interface, while allowing for custom channel changing methodologies required by the application, without rewriting device code 🥳.
-
 
 # Usage
 
@@ -33,8 +32,8 @@ In this case, the TCA9548 exist at address `0x70`, while the two HT16K33 chips a
 The two devices are connected to channel `1` and `3` of the multiplexer.
 
 ```js
-import { Tca9548a } from '@johntalton/tca9548a'
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
+import { Tca9548a } from '@johntalton/tca9548a'
 import { I2CBusTCA9548A } from '@johntalton/i2c-bus-tca9548a'
 import { HT16K33 } from '@johntalton/ht16k33' // example device
 
@@ -42,21 +41,21 @@ import { HT16K33 } from '@johntalton/ht16k33' // example device
 //  like Excamera I2CDriver
 //  or MCP2221 over HID
 //  etc.
-const bus = await SomeUnderlyingI2CBusImplementation()
-const tca = Tca9548a.from(new I2CAddressedBus(bus, 0x70))
+const bus = /* I2CBus */
+const tca = new Tca9548a(new I2CAddressedBus(bus, 0x70))
 
 // create the two managed busses
 // for exclusive strategies, two unique busses are created
-const managedBus_1 = I2CBusTCA9548A.from(bus, tca, { exclusive: 1 })
-const managedBus_3 = I2CBusTCA9548A.from(bus, tca, { exclusive: 3 })
+const managedBus_1 = new I2CBusTCA9548A(bus, tca, { exclusive: 1 })
+const managedBus_3 = new I2CBusTCA9548A(bus, tca, { exclusive: 3 })
 
 // given the managed busses, create addressed devices (same address) for each
-const device_1 = HT16K33.from(new I2CAddressBus(managedBus_1, 0x71))
-const device_3 = HT16K33.from(new I2CAddressBus(managedBus_3, 0x71))
+const device_1 = new HT16K33(new I2CAddressBus(managedBus_1, 0x71))
+const device_3 = new HT16K33(new I2CAddressBus(managedBus_3, 0x71))
 
 ```
 
-Other interaction using the initial code above:
+Example interaction using the above code. Note that the channel is not explicitly set/update in this code, as that is handled by the channel manager:
 
 ```js
 // enable both devices oscillators
@@ -65,6 +64,9 @@ await device_1.enableOscillator()
 // then to channel 3 (only) here
 await device_3.enableOscillator()
 ```
+
+You can still set the channel, and the devices will again manage re-setting it for their specific usage.
+
 ```js
 // external changes to the channels remain valid
 // this will not effect either devices_1 or _3s operation
@@ -75,19 +77,27 @@ await tca.setChannels([ 4 ])
 await device_1.setDisplay(true, 'off')
 await device_3.setDisplay(true, 'off')
 ```
+
+Setting both channel enabled (1 and 3) is also "valid", and when using the devices it will manage the channel to be specific to the device.
+
+However, using other access when both channels are active that is not guarded by the channel manager results in both devices sharing the same address.
+
 ```js
 // The following is valid from the perspective of the tca chip,
 // however, accessing device directly via 0x71 will have undefined behavior ☠️
 // (as noted above, using the managed device_1 or _3 will work)
 await tca.setChannels([ 1, 3 ])
 ```
+
+Given the static nature of most drivers (in this case the Ht16k33) a single instance of the driver be be directly used on an UN-managed bus and used to access each device with Explicit management of the channel
+
 ```js
 // It is also possible to create un-managed device.
 
 // Bypassing the Managed Bus is considered an "escape hatch" for scenarios that do not fit well into the ChannelManager api design.
 
 // Note that this works because the HT16K33 driver is stateless, and not effected by the hardware change
-const eitherDevice = HT16K33.from(new I2CAddressBus(bus, 0x71))
+const eitherDevice = new HT16K33(new I2CAddressBus(bus, 0x71))
 await tca.setChannels([ 1 ])
 await eitherDevice.setDisplay(true, 'off') // effect device on channel 1
 await tca.setChannels([ 3 ])
